@@ -1,26 +1,288 @@
 @import "tailwindcss";
 
-:root {
-  --background: #ffffff;
-  --foreground: #171717;
+/* ─── Design tokens ─────────────────────────────────────────── */
+@theme {
+  /* Colour */
+  --color-espresso: #2b1a14;
+  --color-mocha: #6b4a3a;
+  --color-cream: #f4ece1;
+  --color-champagne: #d8c3a5;
+  --color-blush: #e9c9c1;
+  --color-ivory: #fbf8f3;
+  /* Form errors only (6.2:1 on cream, AA) */
+  --color-error: #9a3324;
+
+  /* Motion: mirror of lib/motion.ts */
+  --ease-luxe: cubic-bezier(0.22, 1, 0.36, 1);
+  --animate-marquee: marquee 60s linear infinite;
+
+  @keyframes marquee {
+    to {
+      transform: translateX(-50%);
+    }
+  }
+
+  --animate-scroll-line: scroll-line 2.4s cubic-bezier(0.22, 1, 0.36, 1) infinite;
+
+  @keyframes scroll-line {
+    from {
+      transform: translateY(-100%);
+    }
+    to {
+      transform: translateY(100%);
+    }
+  }
+
+  /* Sparkle dots: slow fade in and out. Duration/delay overridden per dot. */
+  --animate-twinkle: twinkle 6s ease-in-out infinite;
+
+  @keyframes twinkle {
+    0%,
+    100% {
+      opacity: 0;
+      transform: scale(0.6);
+    }
+    50% {
+      opacity: 0.9;
+      transform: scale(1);
+    }
+  }
+
+  /* Type scale (fluid). Use as text-display, text-hero, text-h1 … text-small */
+  --text-hero: clamp(3rem, 1.2rem + 5.4vw, 7rem); /* 48px phone → ~97px at 1440 → 112px max */
+  --text-hero--line-height: 0.98;
+  --text-hero--letter-spacing: -0.02em;
+  --text-display: clamp(3.5rem, 1.6rem + 8vw, 9.5rem);
+  --text-display--line-height: 0.92;
+  --text-display--letter-spacing: -0.02em;
+  --text-h1: clamp(2.75rem, 1.8rem + 4.2vw, 6rem);
+  --text-h1--line-height: 1;
+  --text-h1--letter-spacing: -0.015em;
+  --text-h2: clamp(2.25rem, 1.7rem + 2.6vw, 4.25rem);
+  --text-h2--line-height: 1.05;
+  --text-h2--letter-spacing: -0.01em;
+  --text-h3: clamp(1.75rem, 1.45rem + 1.3vw, 2.75rem);
+  --text-h3--line-height: 1.15;
+  --text-h4: clamp(1.375rem, 1.25rem + 0.6vw, 1.75rem);
+  --text-h4--line-height: 1.25;
+  --text-body-lg: 1.125rem;
+  --text-body-lg--line-height: 1.7;
+  --text-body: 1rem;
+  --text-body--line-height: 1.7;
+  --text-small: 0.875rem;
+  --text-small--line-height: 1.6;
+  --text-eyebrow: 0.6875rem;
+  --text-eyebrow--line-height: 1.4;
+  --text-eyebrow--letter-spacing: 0.24em;
 }
 
+/* Font families point at the next/font CSS variables set on <html>. */
 @theme inline {
-  --color-background: var(--background);
-  --color-foreground: var(--foreground);
-  --font-sans: var(--font-geist-sans);
-  --font-mono: var(--font-geist-mono);
+  --font-serif: var(--font-cormorant), "Cormorant Garamond", Georgia, serif;
+  --font-sans: var(--font-manrope), ui-sans-serif, system-ui, sans-serif;
 }
 
-@media (prefers-color-scheme: dark) {
-  :root {
-    --background: #0a0a0a;
-    --foreground: #ededed;
+/* Small uppercase, letter-spaced label */
+@utility eyebrow {
+  font-family: var(--font-sans);
+  font-size: var(--text-eyebrow);
+  line-height: var(--text-eyebrow--line-height);
+  letter-spacing: var(--text-eyebrow--letter-spacing);
+  font-weight: 500;
+  text-transform: uppercase;
+}
+
+/* Eased cream fades for laying copy over media. Multi-stop so no hard band shows where the
+   fade begins over dark hair (a plain two-stop gradient does). */
+@utility fade-cream-up {
+  background-image: linear-gradient(
+    to top,
+    var(--color-cream) 0%,
+    rgb(244 236 225 / 0.88) 16%,
+    rgb(244 236 225 / 0.64) 34%,
+    rgb(244 236 225 / 0.36) 54%,
+    rgb(244 236 225 / 0.14) 74%,
+    rgb(244 236 225 / 0.04) 88%,
+    rgb(244 236 225 / 0) 100%
+  );
+}
+@utility fade-cream-down {
+  background-image: linear-gradient(to bottom, var(--color-cream) 0%, rgb(244 236 225 / 0) 100%);
+}
+@utility fade-cream-right {
+  background-image: linear-gradient(
+    to right,
+    var(--color-cream) 0%,
+    var(--color-cream) 24%,
+    rgb(244 236 225 / 0.9) 32%,
+    rgb(244 236 225 / 0.66) 40%,
+    rgb(244 236 225 / 0.38) 48%,
+    rgb(244 236 225 / 0.14) 56%,
+    rgb(244 236 225 / 0.03) 62%,
+    rgb(244 236 225 / 0) 68%
+  );
+}
+
+/* Espresso fade over the left edge of a campaign image, blending it into an espresso section.
+   Clear by 44% so subjects on the right half are untouched. */
+@utility fade-espresso-right {
+  background-image: linear-gradient(
+    to right,
+    var(--color-espresso) 0%,
+    rgb(43 26 20 / 0.9) 10%,
+    rgb(43 26 20 / 0.62) 20%,
+    rgb(43 26 20 / 0.3) 30%,
+    rgb(43 26 20 / 0.08) 38%,
+    rgb(43 26 20 / 0) 44%
+  );
+}
+
+/* Dual range slider: transparent native inputs stacked on one track; only the thumbs take pointer events. */
+@utility range-thumb {
+  appearance: none;
+  background: transparent;
+  pointer-events: none;
+  height: 1.5rem;
+  margin: 0;
+
+  &::-webkit-slider-runnable-track {
+    background: transparent;
+  }
+  &::-webkit-slider-thumb {
+    appearance: none;
+    pointer-events: auto;
+    width: 16px;
+    height: 16px;
+    border-radius: 9999px;
+    background: var(--color-cream);
+    border: 1px solid var(--color-espresso);
+    cursor: grab;
+  }
+  &::-moz-range-thumb {
+    pointer-events: auto;
+    width: 16px;
+    height: 16px;
+    border-radius: 9999px;
+    background: var(--color-cream);
+    border: 1px solid var(--color-espresso);
+    cursor: grab;
+  }
+  &:focus-visible {
+    outline: none;
+  }
+  &:focus-visible::-webkit-slider-thumb {
+    outline: 1.5px solid var(--color-espresso);
+    outline-offset: 2px;
+  }
+  &:focus-visible::-moz-range-thumb {
+    outline: 1.5px solid var(--color-espresso);
+    outline-offset: 2px;
   }
 }
 
-body {
-  background: var(--background);
-  color: var(--foreground);
-  font-family: Arial, Helvetica, sans-serif;
+/* ─── Base ──────────────────────────────────────────────────── */
+@layer base {
+  :root {
+    --focus-ring: var(--color-espresso);
+    color-scheme: light;
+    /* Top offset for sticky bars: the visible navbar height (64px, 72px from lg), 0 while it's hidden. */
+    --sticky-top: 4rem;
+  }
+  @media (width >= 64rem) {
+    :root {
+      --sticky-top: 4.5rem;
+    }
+  }
+  :root[data-nav-hidden] {
+    --sticky-top: 0px;
+  }
+
+  html {
+    background-color: var(--color-cream);
+    -webkit-text-size-adjust: 100%;
+    /* Reserve the scrollbar gutter so locking scroll (loader, menus, drawers) never shifts layout. */
+    scrollbar-gutter: stable;
+  }
+
+  body {
+    background-color: var(--color-cream);
+    color: var(--color-espresso);
+    font-family: var(--font-sans);
+    font-size: var(--text-body);
+    line-height: var(--text-body--line-height);
+    -webkit-font-smoothing: antialiased;
+    -moz-osx-font-smoothing: grayscale;
+    text-rendering: optimizeLegibility;
+  }
+
+  h1,
+  h2,
+  h3,
+  h4,
+  h5,
+  h6 {
+    font-family: var(--font-serif);
+    font-weight: 400;
+    text-wrap: balance;
+  }
+
+  p {
+    text-wrap: pretty;
+  }
+
+  a,
+  button,
+  [role="button"] {
+    touch-action: manipulation;
+    -webkit-tap-highlight-color: transparent;
+  }
+
+  ::selection {
+    background-color: var(--color-blush);
+    color: var(--color-espresso);
+  }
+
+  :focus-visible {
+    outline: 1.5px solid var(--focus-ring);
+    outline-offset: 4px;
+  }
+}
+
+/* ─── Reveal components ─────────────────────────────────────── */
+/* Hidden before hydration so nothing flashes; GSAP takes over. Reduced motion never hides. */
+@media (prefers-reduced-motion: no-preference) {
+  [data-reveal="text"] {
+    visibility: hidden;
+  }
+  [data-reveal="image"] {
+    clip-path: inset(100% 0 0 0);
+  }
+}
+
+/* Intro loader: letters start hidden (GSAP fades them up). On a repeat visit in the same
+   session, an inline script in <head> sets data-intro-seen so the loader never paints. */
+[data-loader] [data-letter] {
+  opacity: 0;
+}
+[data-intro-seen] [data-loader] {
+  display: none;
+}
+
+/* Nav icons over the hero film: on desktop the right-hand icons sit over the moving hair, which
+   alternates between dark strands and pale background, so no single icon colour stays legible.
+   While the header is transparent over the hero, the icons get a soft frosted cream pill behind
+   them (icons stay espresso). It fades away once the header turns solid. CSS-only (:has), so it
+   is correct from first paint. */
+@media (width >= 64rem) {
+  body:has([data-hero]) header[data-solid="false"] [data-nav-icons] {
+    background-color: rgb(244 236 225 / 0.8);
+    -webkit-backdrop-filter: blur(10px);
+    backdrop-filter: blur(10px);
+  }
+}
+
+/* Line masks: a little breathing room so serif ascenders and descenders are not clipped. */
+.reveal-line-mask {
+  padding-block: 0.1em 0.24em;
+  margin-block: -0.1em -0.24em;
 }

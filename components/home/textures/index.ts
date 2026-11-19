@@ -1,0 +1,1 @@
+export { ShopByTexture } from "./ShopByTexture";

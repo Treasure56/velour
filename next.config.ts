@@ -7,6 +7,10 @@ const nextConfig: NextConfig = {
   },
   cacheComponents: true,
   partialPrefetching: true,
+  images: {
+    // Next 16 requires an explicit allowlist. 90 is used for campaign imagery (holiday banner).
+    qualities: [75, 90],
+  },
   turbopack: {
     rules: {
       "*.css": {
